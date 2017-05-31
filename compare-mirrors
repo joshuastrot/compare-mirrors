@@ -91,7 +91,7 @@ if [ $1 == "-u" ] || [ $1 == "--update" ]; then
     echo "=> Parsing Databases..."
     
     #Remove file showing databases were fully synced
-    rm ~/.compare-mirrors/fullysynced
+    rm -f ~/.compare-mirrors/fullysynced
     
     tar -tf $ManjaroPath/core-i686.db | cut -f1 -d"/" | uniq > $ManjaroPath/core-i686.lst
     tar -tf $ManjaroPath/core-x86_64.db | cut -f1 -d"/" | uniq > $ManjaroPath/core-x86_64.lst
