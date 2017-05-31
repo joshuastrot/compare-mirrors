@@ -89,6 +89,10 @@ if [ $1 == "-u" ] || [ $1 == "--update" ]; then
     #This is going to put everyting in a bit more friendly format for the Python script.
     #Take all the top level directories from the databases, and save them into a file.
     echo "=> Parsing Databases..."
+    
+    #Remove file showing databases were fully synced
+    rm ~/.compare-mirrors/fullysynced
+    
     tar -tf $ManjaroPath/core-i686.db | cut -f1 -d"/" | uniq > $ManjaroPath/core-i686.lst
     tar -tf $ManjaroPath/core-x86_64.db | cut -f1 -d"/" | uniq > $ManjaroPath/core-x86_64.lst
     tar -tf $ManjaroPath/extra-i686.db | cut -f1 -d"/" | uniq > $ManjaroPath/extra-i686.lst
@@ -104,6 +108,9 @@ if [ $1 == "-u" ] || [ $1 == "--update" ]; then
     tar -tf $ArchPath/community-i686.db | cut -f1 -d"/" | uniq > $ArchPath/community-i686.lst
     tar -tf $ArchPath/community-x86_64.db | cut -f1 -d"/" | uniq > $ArchPath/community-x86_64.lst
     tar -tf $ArchPath/multilib-x86_64.db | cut -f1 -d"/" | uniq > $ArchPath/multilib-x86_64.lst
+    
+    #Create file to show databases fully synced.
+    touch ~/.compare-mirrors/fullysynced
     
     echo "" #Echo new line
     
@@ -121,6 +128,11 @@ fi
 
 #Dry run the compare process. Don't redownload all the databases.
 if [ $1 == "-c" ] || [ $1 == "--compare" ]; then
+    if [ ! -f ~/compare-mirrors/fullysynced ]; then
+        echo "=> Databases are not downloaded, please download them first with the -u option."
+        exit 1
+    fi
+
     if [ ! -z $2 ]; then
         if [ $2 == "-a" ] || [ $2 == "--additions" ]; then
             python /usr/share/compare-mirrors/sort-repositories.py -a
