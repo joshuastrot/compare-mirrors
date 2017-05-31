@@ -68,7 +68,7 @@ for DB in Databases:
                     VersionValue = Proc.stdout.read()
                     
                     if VersionValue.decode("utf-8").replace("\n", "") == "-1":
-                        print("        Outdated: " + PackageFull + "  ->  Arch: " + Package)
+                        print("        Difference: " + PackageFull + "  ->  Arch: " + Package)
     else:
         print("        None")
     print("")
