@@ -1,6 +1,6 @@
 # compare-mirrors
 
-Compare-Mirrors is a program to compare package differences between Manjaro and Arch mirrors. It downloads the databases from the supplied mirrors, and then checks for package additions on the Arch mirror, or package upgrades / downgrades.
+Compare-Mirrors is a program to compare package differences between Manjaro and Arch mirrors. It downloads the databases from the supplied mirrors, and then checks for package additions on the Arch mirror, and package upgrades
 
 
 # Installation

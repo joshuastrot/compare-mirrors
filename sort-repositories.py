@@ -65,10 +65,8 @@ for DB in Databases:
                     Proc = subprocess.Popen(['/usr/bin/vercmp', PackageFull.rsplit("-", 2)[1] + "-" + PackageFull.rsplit("-", 2)[2], Package.rsplit("-", 2)[1] + "-" + Package.rsplit("-", 2)[2]], stdout=subprocess.PIPE)
                     VersionValue = Proc.stdout.read()
                     
-                    if VersionValue.decode("utf-8").replace("\n", "") == "1":
-                        print("        Downgrade: " + Package)
-                    else:
-                        print("        Upgrade:   " + Package)
+                    if VersionValue.decode("utf-8").replace("\n", "") == "-1":
+                        print("        Outdated: " + PackageFull + "  ->  Arch: " + Package)
     else:
         print("        None")
     print("")
