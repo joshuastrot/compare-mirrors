@@ -9,6 +9,7 @@
 ################################
 
 from os import path
+from sys import argv
 import subprocess
 
 #Set some basic variables
@@ -42,22 +43,23 @@ for DB in Databases:
     NewPackages = sorted(list(set(ArchPackages) - set(ManjaroPackages)))
     NewPackagesNV = sorted(list(set(ArchPackagesNV) - set(ManjaroPackagesNV)))
     
-    print("    => [" + DB + "] New Packages in Arch")
-    
     #Output all new packages in Arch repos.
-    if NewPackagesNV:
-        for Package in NewPackagesNV:
-            for PackageFull in ArchPackages:
-                if PackageFull.rsplit("-", 2)[0] == Package:
-                    print("        " + PackageFull)
-                    continue
-    else:
-        print("        None")
-        
-    print("\n    => [" + DB + "] Version Change")
+    if len(argv) > 1:
+        print("    => [" + DB + "] New Packages in Arch")
+    
+        if NewPackagesNV:
+            for Package in NewPackagesNV:
+                for PackageFull in ArchPackages:
+                    if PackageFull.rsplit("-", 2)[0] == Package:
+                        print("        " + PackageFull)
+                        continue
+        else:
+            print("        None")
         
     #Output all packages that have changed in versions. 
     #Uses vercmp to determine update or downgrade.
+    print("\n    => [" + DB + "] Version Change")
+        
     if NewPackages:
         for Package in NewPackages:
             for PackageFull in ManjaroPackages:

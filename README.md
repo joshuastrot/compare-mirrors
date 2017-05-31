@@ -24,7 +24,10 @@ You can also dry-run it without redownloading the databases by running it with t
 ```
 compare-mirrors -c
 ```
-
+If you would like to view packages added in Arch and not yet in Manjaro yet, use the `-a` flag.
+```
+compare-mirrors -u -a
+```
 
 ## Configuration
 

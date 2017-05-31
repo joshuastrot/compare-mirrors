@@ -32,20 +32,21 @@ if [ -z $1 ]; then
 fi
 
 #Display help
-if [ $1 == "-h" ] || [ $1 == "--help" ]; then
+if [ $1 == "-h" ] || [ $1 == "--help" ] || [ $1 == "-h" ] || [ $1 == "--help" ]; then
     echo """
 Usage: compare-mirrors <flags>
 
 <flags>
     -c, --compare          Compare the repositories
     -u, --update           Update the databases
+    -a, --additions        Show packages added in Arch repositories
     --clear                Clear all downloaded databases
     """
     exit 1
 fi
 
 #update the databases
-if [ $1 == "-u" ] || [ $1 == "--update" ]; then
+if [ $1 == "-u" ] || [ $1 == "--update" ] || [ $2 == "-u" ] || [ $2 == "--update" ]; then
     
     #This is going to download all the repository databases from the Manjaro mirror.
     echo "=> Downloading the databases from the Manjaro Mirror..."
@@ -107,12 +108,22 @@ if [ $1 == "-u" ] || [ $1 == "--update" ]; then
     echo "" #Echo new line
     
     echo "=> Starting Checking Repositories..."
-    python /usr/share/compare-mirrors/sort-repositories.py
+    if [ $1 == "-a" ] || [ $1 == "--additions" ] || [ $2 == "-a" ] || [ $2 == "--additions" ]; then
+        python /usr/share/compare-mirrors/sort-repositories.py -a
+    else 
+        python /usr/share/compare-mirrors/sort-repositories.py
+    fi
+        
 fi
 
-if [ $1 == "-c" ] || [ $1 == "--compare" ]; then
+#Dry run the compare process. Don't redownload all the databases.
+if [ $1 == "-c" ] || [ $1 == "--compare" ] || [ $2 == "-c" ] || [ $2 == "--compare" ]; then
     echo "=> Starting Checking Repositories..."
-    python /usr/share/compare-mirrors/sort-repositories.py
+    if [ $1 == "-a" ] || [ $1 == "--additions" ] || [ $2 == "-a" ] || [ $2 == "--additions" ]; then
+        python /usr/share/compare-mirrors/sort-repositories.py -a
+    else 
+        python /usr/share/compare-mirrors/sort-repositories.py
+    fi
 fi
 
 #Clear Databases
