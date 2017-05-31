@@ -12,7 +12,7 @@ if [ "$1" == "-r" ] || [ "$1" == "--remove" ]; then
     exit 1
 fi
 
-echo "Installing Miyo..."
+echo "Installing compare-mirrors..."
 
 if [ ! -d "/usr/share/compare-mirrors" ]; then
     echo "Creating /usr/share/compare-mirrors"
