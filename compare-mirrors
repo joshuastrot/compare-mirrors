@@ -1,0 +1,119 @@
+#!/usr/bin/bash
+
+################################
+#
+# Coded entirely by Joshua Strot
+#
+# joshuastrot@gmail.com
+#
+################################
+
+#Create database directory if not already existing.
+mkdir -p ~/.compare-mirrors
+mkdir -p ~/.compare-mirrors/manjaro
+mkdir -p ~/.compare-mirrors/arch
+
+#Copy over configuration file if not aleady present.
+if [ ! -f ~/.compare-mirrors/compare-mirrors.conf ]; then
+    cp /usr/share/compare-mirrors/compare-mirrors.conf ~/.compare-mirrors
+fi
+
+#Load Configuration Files. :-D
+. ~/.compare-mirrors/compare-mirrors.conf
+
+#Direct paths to each database
+ManjaroPath=~/.compare-mirrors/manjaro
+ArchPath=~/.compare-mirrors/arch
+
+#Make sure flag is used
+if [ -z $1 ]; then
+    echo -e "Please use a correct flag.\n    compare-mirrors -h"
+    exit 1
+fi
+
+#Display help
+if [ $1 == "-h" ] || [ $1 == "--help" ]; then
+    echo """
+Usage: compare-mirrors <flags>
+
+<flags>
+    -c, --compare          Compare the repositories
+    -u, --update           Update the databases
+    --clear                Clear all downloaded databases
+    """
+    exit 1
+fi
+
+#update the databases
+if [ $1 == "-u" ] || [ $1 == "--update" ]; then
+    
+    #This is going to download all the repository databases from the Manjaro mirror.
+    echo "=> Downloading the databases from the Manjaro Mirror..."
+    echo "    => Downloading core/i686"
+    wget --quiet -O $ManjaroPath/core-i686.db "$ManjaroMirror/$Branch/core/i686/core.db" 
+    echo "    => Downloading core/x86_64"
+    wget --quiet -O $ManjaroPath/core-x86_64.db "$ManjaroMirror/$Branch/core/x86_64/core.db" 
+    echo "    => Downloading extra/i686"
+    wget --quiet -O $ManjaroPath/extra-i686.db "$ManjaroMirror/$Branch/extra/i686/extra.db" 
+    echo "    => Downloading extra/x86_64"
+    wget --quiet -O $ManjaroPath/extra-x86_64.db "$ManjaroMirror/$Branch/extra/x86_64/extra.db" 
+    echo "    => Downloading community/i686"
+    wget --quiet -O $ManjaroPath/community-i686.db "$ManjaroMirror/$Branch/community/i686/community.db" 
+    echo "    => Downloading community/x86_64"
+    wget --quiet -O $ManjaroPath/community-x86_64.db "$ManjaroMirror/$Branch/community/x86_64/community.db" 
+    echo "    => Downloading multilib/x86_64"
+    wget --quiet -O $ManjaroPath/multilib-x86_64.db "$ManjaroMirror/$Branch/multilib/x86_64/multilib.db" 
+    
+    echo "" #Echo new line
+    
+    #Same, but for the Arch mirror
+    echo "=> Downloading the databases from the Arch Mirror..."
+    echo "    => Downloading core/i686"
+    wget --quiet -O $ArchPath/core-i686.db "$ArchMirror/core/os/i686/core.db" 
+    echo "    => Downloading core/x86_64"
+    wget --quiet -O $ArchPath/core-x86_64.db "$ArchMirror/core/os/x86_64/core.db" 
+    echo "    => Downloading extra/i686"
+    wget --quiet -O $ArchPath/extra-i686.db "$ArchMirror/extra/os/i686/extra.db" 
+    echo "    => Downloading extra/x86_64"
+    wget --quiet -O $ArchPath/extra-x86_64.db "$ArchMirror/extra/os/x86_64/extra.db" 
+    echo "    => Downloading community/i686"
+    wget --quiet -O $ArchPath/community-i686.db "$ArchMirror/community/os/i686/community.db" 
+    echo "    => Downloading community/x86_64"
+    wget --quiet -O $ArchPath/community-x86_64.db "$ArchMirror/community/os/x86_64/community.db" 
+    echo "    => Downloading multilib/x86_64"
+    wget --quiet -O $ArchPath/multilib-x86_64.db "$ArchMirror/multilib/os/x86_64/multilib.db" 
+    
+    echo "" #Echo new line
+    
+    #This is going to put everyting in a bit more friendly format for the Python script.
+    #Take all the top level directories from the databases, and save them into a file.
+    echo "=> Parsing Databases..."
+    tar -tf $ManjaroPath/core-i686.db | cut -f1 -d"/" | uniq > $ManjaroPath/core-i686.lst
+    tar -tf $ManjaroPath/core-x86_64.db | cut -f1 -d"/" | uniq > $ManjaroPath/core-x86_64.lst
+    tar -tf $ManjaroPath/extra-i686.db | cut -f1 -d"/" | uniq > $ManjaroPath/extra-i686.lst
+    tar -tf $ManjaroPath/extra-x86_64.db | cut -f1 -d"/" | uniq > $ManjaroPath/extra-x86_64.lst
+    tar -tf $ManjaroPath/community-i686.db | cut -f1 -d"/" | uniq > $ManjaroPath/community-i686.lst
+    tar -tf $ManjaroPath/community-x86_64.db | cut -f1 -d"/" | uniq > $ManjaroPath/community-x86_64.lst
+    tar -tf $ManjaroPath/multilib-x86_64.db | cut -f1 -d"/" | uniq > $ManjaroPath/multilib-x86_64.lst
+    
+    tar -tf $ArchPath/core-i686.db | cut -f1 -d"/" | uniq > $ArchPath/core-i686.lst
+    tar -tf $ArchPath/core-x86_64.db | cut -f1 -d"/" | uniq > $ArchPath/core-x86_64.lst
+    tar -tf $ArchPath/extra-i686.db | cut -f1 -d"/" | uniq > $ArchPath/extra-i686.lst
+    tar -tf $ArchPath/extra-x86_64.db | cut -f1 -d"/" | uniq > $ArchPath/extra-x86_64.lst
+    tar -tf $ArchPath/community-i686.db | cut -f1 -d"/" | uniq > $ArchPath/community-i686.lst
+    tar -tf $ArchPath/community-x86_64.db | cut -f1 -d"/" | uniq > $ArchPath/community-x86_64.lst
+    tar -tf $ArchPath/multilib-x86_64.db | cut -f1 -d"/" | uniq > $ArchPath/multilib-x86_64.lst
+    
+    echo "" #Echo new line
+    
+    echo "=> Starting Checking Repositories..."
+    python /usr/share/compare-mirrors/sort-repositories.py
+fi
+
+#Clear Databases
+if [ $1 == "--clear" ]; then
+    echo "Clearing databases..."
+    rm ~/.compare-mirrors/manjaro/*.db
+    rm ~/.compare-mirrors/arch/*.db
+    echo "Finished clearing databases."
+fi
