@@ -110,6 +110,11 @@ if [ $1 == "-u" ] || [ $1 == "--update" ]; then
     python /usr/share/compare-mirrors/sort-repositories.py
 fi
 
+if [ $1 == "-c" ] || [ $1 == "--compare" ]; then
+    echo "=> Starting Checking Repositories..."
+    python /usr/share/compare-mirrors/sort-repositories.py
+fi
+
 #Clear Databases
 if [ $1 == "--clear" ]; then
     echo "Clearing databases..."
