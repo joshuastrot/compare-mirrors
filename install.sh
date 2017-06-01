@@ -23,16 +23,16 @@ else
 fi
 
 echo "Copying data to compare-mirrors directory."
-cp sort-repositories.py /usr/share/compare-mirrors
-cp compare-mirrors.conf /usr/share/compare-mirrors
-cp README.md /usr/share/compare-mirrors
+cp -r utilities_ /usr/share/compare-mirrors
+cp compare-mirrors.yaml /usr/share/compare-mirrors
+cp compare-mirrors.py /usr/share/compare-mirrors
 
 echo "Copying the compare-mirrors executable"
 cp compare-mirrors /usr/bin
 
 echo "Making executable"
 chmod +x /usr/bin/compare-mirrors
-chmod +x /usr/share/compare-mirrors/sort-repositories.py
+chmod +x /usr/share/compare-mirrors/compare-mirrors.py
 
 
 

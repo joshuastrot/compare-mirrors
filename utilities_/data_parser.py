@@ -19,8 +19,14 @@ def parseConfiguration(xdgConfig):
             configFile = load(file)
             configPath = xdgConfig + "/compare-mirrors/compare-mirrors.yaml"
     except IOError as e:
-        configFile = load("/usr/share/compare-mirrors/compare-mirrors.yaml")
-        configPath = "/usr/share/compare-mirrors/compare-mirrors.yaml"
+        try:
+            with open("/usr/share/compare-mirrors/compare-mirrors.yaml") as file:
+                configFile = load(file)
+                configPath = "/usr/share/compare-mirrors/compare-mirrors.yaml"
+        except IOError as e:
+            print("=> No configuration files could be found.", file=stderr)
+            exit(1)
+            
     
     return configFile
 
