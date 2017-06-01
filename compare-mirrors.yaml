@@ -1,0 +1,22 @@
+#Configuration file for compare-mirrors
+
+#NOTE: trailing forward slashes at the end of mirrors's are needed
+
+#Mirror to download the Manjaro databases from
+ManjaroMirror: http://mirror.solarvps.com/manjaro/
+
+#Mirror to downlaod the Arch databases from
+ArchMirror: http://mirror.lty.me/archlinux/
+
+#Manjaro branch to compare
+Branch: stable
+
+#Repositories to compare. 
+Repositories: 
+    - core-i686 
+    #- core-x86_64 
+    #- extra-i686 
+    #- extra-x86_64 
+    #- community-i686 
+    #- community-x86_64 
+    #- multilib-x86_64
