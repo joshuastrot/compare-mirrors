@@ -1,5 +1,12 @@
 #!/usr/bin/bash
 
+#
+# Coded by Joshua Strot
+#
+# E-Mail: joshuastrot@gmail.com
+# URL: https://github.com/joshuastrot/compare-mirrors
+#
+
 if [ $EUID != 0 ]; then
     echo "This script needs to be ran as root! Exiting..."
     exit

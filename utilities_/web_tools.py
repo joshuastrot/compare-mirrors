@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 
+#
+# Coded by Joshua Strot
+#
+# E-Mail: joshuastrot@gmail.com
+# URL: https://github.com/joshuastrot/compare-mirrors
+#
+
 from os import makedirs, path
 from urllib import request
-
 
 def updateDB(yamlFormat, configuration, xdgCache):
     """

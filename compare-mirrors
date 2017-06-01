@@ -1,3 +1,10 @@
 #!/usr/bin/bash
 
+#
+# Coded by Joshua Strot
+#
+# E-Mail: joshuastrot@gmail.com
+# URL: https://github.com/joshuastrot/compare-mirrors
+#
+
 python /usr/share/compare-mirrors/compare-mirrors.py $@

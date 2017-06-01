@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+#
+# Coded by Joshua Strot
+#
+# E-Mail: joshuastrot@gmail.com
+# URL: https://github.com/joshuastrot/compare-mirrors
+#
+
 def output(yamlFormat, configuration, versionDifferences):
     """
     Output the version differences. 
@@ -8,12 +15,14 @@ def output(yamlFormat, configuration, versionDifferences):
     #Output format done here:
     if not yamlFormat:
         print("=> Version Changes")
+    
+        #Output all the versions in plain format
         for repository in configuration["Repositories"]:
             print("    => [" + repository + "] Version Changes")
             for packageName, packageVersions in versionDifferences[repository].items():
                 print("        => %s-%s  ->  %s-%s" % (packageName, packageVersions[0], packageName, packageVersions[1]))
     else:
-        #Output format in Yaml:
+        # Yaml format:
         #Repository
         #    - Package name
         #        -Manjaro Version
@@ -25,7 +34,7 @@ def output(yamlFormat, configuration, versionDifferences):
 
         """)
         
-        
+        #Output in YAML format
         for repository in configuration["Repositories"]:
             print(repository + ":")
             for packageName, packageVersions in versionDifferences[repository].items():

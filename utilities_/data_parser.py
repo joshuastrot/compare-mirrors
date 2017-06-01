@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+#
+# Coded by Joshua Strot
+#
+# E-Mail: joshuastrot@gmail.com
+# URL: https://github.com/joshuastrot/compare-mirrors
+#
+
 import subprocess
 from yaml import load
 from urllib import request
@@ -15,26 +22,26 @@ def parseConfiguration(xdgConfig):
     
     #Load the configuration file
     try:
-        with open(xdgConfig + "/compare-mirrors/compare-mirrors.yaml") as file:
+        with open(xdgConfig + "/compare-mirrors/compare-mirrors.yaml") as file: #Attempt to fetch user defined first
             configFile = load(file)
             configPath = xdgConfig + "/compare-mirrors/compare-mirrors.yaml"
     except IOError as e:
         try:
-            with open("/usr/share/compare-mirrors/compare-mirrors.yaml") as file:
+            with open("/usr/share/compare-mirrors/compare-mirrors.yaml") as file: #Fall back to skeleton
                 configFile = load(file)
                 configPath = "/usr/share/compare-mirrors/compare-mirrors.yaml"
-        except IOError as e:
-            print("=> No configuration files could be found.", file=stderr)
+        except IOError as e: 
+            print("=> No configuration files could be found.", file=stderr) #Something is wrong, error out and exit
             exit(1)
             
-    
     return configFile
 
 
 def checkCache(xdgCache, configuration):
     """
-    Check the cache files to ensure that the needed ones are present
+    Check the cache files to ensure that the needed ones are present, exit if not
     """
+    
     for repository in configuration["Repositories"]:
         if not path.isfile(xdgCache + "/compare-mirrors/manjaro/" + repository + ".db") or not path.isfile(xdgCache + "/compare-mirrors/manjaro/" + repository + ".db"):
             print("=> Cache's are corrupted. Please use the -u option instead", file=stderr)
@@ -58,7 +65,7 @@ def prepareDatabases(yamlFormat, configuration, xdgCache):
     if not yamlFormat:
         print("    => Parsing Manjaro databases")
     
-    #Generate Manjaro package list
+    #Generate Manjaro package list.
     for repository in configuration["Repositories"]:
         database = tarOpen(xdgCache + "/compare-mirrors/manjaro/" + repository.split("-")[0] + "-" + repository.split("-")[1] + ".db")
         packageList = [package for package in database.getnames() if "/" not in package]
