@@ -9,207 +9,32 @@
 #######################
 
 import argparse
-import subprocess
+from utilities_ import *
 from sys import exit, argv
-from os import environ, listdir, makedirs, path
-from os.path import expanduser
-from yaml import load
-from urllib import request
-from tarfile import open as tarOpen
+from os import environ, path
 
-def displayHelp():
-    """
-        Display the help menu, then exit.
-    """
-    print("""
-Usage: compare-mirrors <flags>
-
-<flags>
-    -c, --compare          Compare the repositories
-    -u, --update           Update the databases
-    -a, --additions        Show packages added in Arch repositories
-    --clear                Clear all downloaded databases
-    """)
+def beginComparing(yamlFormat, updateDB):
+    configuration = data_parser.parseConfiguration(xdgConfig)
     
-    exit("0")
-
-
-def parseConfiguration(xdgConfig):
-    """
-        Parse the configuration file and load settings.
-    """
+    if updateDB:
+        web_tools.updateDB(yamlFormat, configuration, xdgCache)
     
-    #Load the configuration file
-    try:
-        with open(xdgConfig + "/compare-mirrors/compare-mirrors.yaml") as file:
-            configFile = load(file)
-            configPath = xdgConfig + "/compare-mirrors/compare-mirrors.yaml"
-    except IOError as e:
-        configFile = load("/usr/share/compare-mirrors/compare-mirrors.yaml")
-        configPath = "/usr/share/compare-mirrors/compare-mirrors.yaml"
-    
-    return configFile
-
-
-def updateDB(yamlFormat, configuration, xdgCache):
-    """
-        Update the databases and parse them into usable format.
-    """
-    
-    #Make necessary directories, provided not already present
-    if not path.isdir(xdgCache + "/compare-mirrors/manjaro") or not path.isdir(xdgCache + "/compare-mirrors/arch"):
-        makedirs(xdgCache + "/compare-mirrors/manjaro", exist_ok=True)
-        makedirs(xdgCache + "/compare-mirrors/arch", exist_ok=True)
-    
-    if not yamlFormat:
-        print("=> Downloading the databases from the Manjaro Mirror")
-    
-    #Download the Manjaro repositories
-    for repository in configuration["Repositories"]:
-        if not yamlFormat:
-            print("    => Downloading " + repository)
-
-        request.urlretrieve(configuration["ManjaroMirror"] + configuration["Branch"] + "/" + repository.split("-")[0] + "/" + \
-            repository.split("-")[1] + "/" + repository.split("-")[0] + ".db", xdgCache + "/compare-mirrors/manjaro/" + \
-            repository.split("-")[0] + "-" + repository.split("-")[1] + ".db")
-    
-    if not yamlFormat:
-        print("=> Downloading the databases from the Arch Mirror")
-    
-    #Download the Arch repositories
-    for repository in configuration["Repositories"]:
-        if not yamlFormat:
-            print("    => Downloading " + repository)
-        
-        request.urlretrieve(configuration["ArchMirror"] + repository.split("-")[0] + "/os/" + repository.split("-")[1] + \
-            "/" + repository.split("-")[0] + ".db", xdgCache + "/compare-mirrors/arch/" + repository.split("-")[0] + "-" + \
-            repository.split("-")[1] + ".db")
-      
-      
-def prepareDatabases(yamlFormat, configuration, xdgCache):
-    """
-        Prepare the databases to be parsed. Creates .lst files with all packages and versions.
-    """
-    
-    if not yamlFormat:
-        print("=> Parsing Databases")
-    
-    #Create the packages dictionary
-    packagesDictionary = {
-            "Manjaro": {},
-            "Arch": {}
-    }
-    
-    if not yamlFormat:
-        print("    => Parsing Manjaro databases")
-    
-    #Generate Manjaro package list
-    for repository in configuration["Repositories"]:
-        database = tarOpen(xdgCache + "/compare-mirrors/manjaro/" + repository.split("-")[0] + "-" + repository.split("-")[1] + ".db")
-        packageList = [package for package in database.getnames() if "/" not in package]
-        packagesDictionary["Manjaro"][repository] = packageList
-
-    if not yamlFormat:
-        print("    => Parsing Arch databases")
-    
-    #Generate Arch package list
-    for repository in configuration["Repositories"]:
-        database = tarOpen(xdgCache + "/compare-mirrors/arch/" + repository.split("-")[0] + "-" + repository.split("-")[1] + ".db")
-        packageList = [package for package in database.getnames() if "/" not in package]
-        packagesDictionary["Arch"][repository] = packageList
-
-    return packagesDictionary
-    
-    
-def compareDatabases(yamlFormat, configuration, databases):
-    """
-        Compare the databases and output results
-    """
-    
-    if not yamlFormat:
-        print("=> Comparing databases")
-    
-    #Initialize the version change
-    versionChanges = {}
-    
-    #Begin comparing the databases.
-    for repository in configuration["Repositories"]:
-        versionChanges[repository] = {}
-        
-        manjaroPackages = databases["Manjaro"][repository]
-        archPackages = databases["Arch"][repository]
-        
-        #Generate list of all similarities
-        uniqPackages = sorted(list(set(archPackages) - set(manjaroPackages)))
-        
-        #Main loops to compare the packages
-        #iterates over unique packages, compares just the package names to identify the package in the manjaro
-        #repository, and then compares those version numbers. 
-        for package in uniqPackages:
-            for packageFull in manjaroPackages:
-                if packageFull.rsplit("-", 2)[0] == package.rsplit("-", 2)[0]:
-                    versionValue = compareVersions(packageFull.rsplit("-", 2)[1] + "-" + packageFull.rsplit("-", 2)[2], \
-                        package.rsplit("-", 2)[1] + "-" + package.rsplit("-", 2)[2])
-                    if versionValue:
-                        versionChanges[repository][package.rsplit("-", 2)[0]] = [packageFull.rsplit("-", 2)[1] + "-" + packageFull.rsplit("-", 2)[2], \
-                        package.rsplit("-", 2)[1] + "-" + package.rsplit("-", 2)[2]]
-        
-    
-    return versionChanges
-
-def compareVersions(versionOne, versionTwo):
-    """
-        Compare two package versions using vercmp. Return True is versionTwo newer
-    """
-    
-    #Use vercmp to verify that the packages in Manjaro are not actually newer. 
-    Proc = subprocess.Popen(['/usr/bin/vercmp', versionOne, versionTwo], stdout=subprocess.PIPE)
-    VersionValue = Proc.stdout.read()
-    
-    #Process vercmp output
-    if VersionValue.decode("utf-8").replace("\n", "") == "-1":
-        return True
-    else:
-        return False
-    
-def output(yamlFormat, configuration, versionDifferences):
-    """
-        Output the version differences. 
-    """
-    
-    #Output format done here:
-    if not yamlFormat:
-        print("=> Version Changes")
-        for repository in configuration["Repositories"]:
-            print("    => [" + repository + "] Version Changes")
-            for packageName, packageVersions in versionDifferences[repository].items():
-                print("        => %s-%s  ->  %s-%s" % (packageName, packageVersions[0], packageName, packageVersions[1]))
-    else:
-        #Output format in Yaml:
-        #Repository
-        #    - Package name
-        #        -Manjaro Version
-        #        -Arch Version
-        
-        for repository in configuration["Repositories"]:
-            print(repository + ":")
-            for packageName, packageVersions in versionDifferences[repository].items():
-                print("    - " + packageName + ":")
-                print("        - \"" + packageVersions[0] + "\"")
-                print("        - \"" + packageVersions[1] + "\"")
-    
+    data_parser.checkCache(xdgCache, configuration)
+    databases = data_parser.prepareDatabases(yamlFormat, configuration, xdgCache)
+    versionChanges = data_parser.compareDatabases(yamlFormat, configuration, databases)
+    control_output.output(yamlFormat, configuration, versionChanges)
 
 #Check for XDG configuration path
 if environ.get("XDG_CONFIG_HOME"):
     xdgConfig = environ["XDG_CONFIG_HOME"]
 else:
-    xdgConfig = expanduser("~") + "/.config"    
+    xdgConfig = path.expanduser("~") + "/.config"    
 
 #Check for XDG cache path
 if environ.get("XDG_CACHE_HOME"):
     xdgCache = environ["XDG_CACHE_HOME"]
 else:
-    xdgCache = expanduser("~") + "/.cache"
+    xdgCache = path.expanduser("~") + "/.cache"
         
 #Set up the argument parser
 parser = argparse.ArgumentParser(description='Compare the Manjaro and Arch repositories by downloading their databases.')
@@ -227,35 +52,11 @@ if len(argv)==1:
 args=parser.parse_args()
 
 #Begin running program
-if args.update is not None:
-    if not args.yaml:
-        configuration = parseConfiguration(xdgConfig)
-        updateDB(False, configuration, xdgCache)
-        databases = prepareDatabases(False, configuration, xdgCache)
-        versionChanges = compareDatabases(False, configuration, databases)
-        output(False, configuration, versionChanges)
-        exit(0)
-    else:
-        configuration = parseConfiguration(xdgConfig)
-        updateDB(True, configuration, xdgCache)
-        databases = prepareDatabases(True, configuration, xdgCache)
-        versionChanges = compareDatabases(True, configuration, databases)
-        output(True, configuration, versionChanges)
-        exit(0)
-    exit(0)
-        
+if args.update:
+    beginComparing(args.yaml, True)
 
-#Code to dry run the program. Basically just doesn't use the updateDB function.
-if args.compare is not None:
-    if not args.yaml:
-        configuration = parseConfiguration(xdgConfig)
-        databases = prepareDatabases(False, configuration, xdgCache)
-        versionChanges = compareDatabases(False, configuration, databases)
-        output(False, configuration, versionChanges)
-        exit(0)
-    else:
-        configuration = parseConfiguration(xdgConfig)
-        databases = prepareDatabases(True, configuration, xdgCache)
-        versionChanges = compareDatabases(True, configuration, databases)
-        output(True, configuration, versionChanges)
-        exit(0)
+if args.compare and not args.update:
+    beginComparing(args.yaml, False)
+
+if args.clear:
+    data_parser.clear(args.yaml, xdgCache)
