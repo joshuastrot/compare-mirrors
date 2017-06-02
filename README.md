@@ -1,6 +1,6 @@
 # compare-mirrors
 
-Compare-Mirrors is a program to compare package differences between Manjaro and Arch mirrors. It downloads the databases from the supplied mirrors, and then checks for package changes between the mirrors.
+Compare-Mirrors is a program to compare package differences between Manjaro and Arch mirrors. It downloads the databases from the supplied mirrors, and then checks for package changes between the mirrors. It supports YAML and CSV output formats, and can be piped directly into other programs or saved into files.
 
 
 # Installation
@@ -40,14 +40,19 @@ or
 ```
 compare-mirrors -u --clear
 ```
-If you would like it to output in YAML format, then pass the -y flag as well.
+If you would like it to output in a specifc format, you can use the `-f` flag. Options are `yaml`, or `csv`
 ```
-compare-mirrors -y
+compare-mirrors -f yaml -u
 ```
-You can capture the YAML format in a file, or pipe it into another program to process.
+or
 ```
-compare-mirrors -y > packages.yaml
+compare-mirrors -f csv -u
 ```
+To save into a file, direct it's output into a file of your choosing.
+```
+compare-mirrors -f yaml -u > packages.yaml
+```
+
 
 ## Configuration
 
