@@ -48,12 +48,12 @@ def checkCache(xdgCache, configuration):
             exit(1)
     
 
-def prepareDatabases(yamlFormat, configuration, xdgCache):
+def prepareDatabases(outFormat, configuration, xdgCache):
     """
     Prepare the databases to be parsed.
     """
     
-    if not yamlFormat:
+    if not outFormat:
         print("=> Parsing Databases")
     
     #Create the packages dictionary
@@ -62,7 +62,7 @@ def prepareDatabases(yamlFormat, configuration, xdgCache):
             "Arch": {}
     }
     
-    if not yamlFormat:
+    if not outFormat:
         print("    => Parsing Manjaro databases")
     
     #Generate Manjaro package list.
@@ -71,7 +71,7 @@ def prepareDatabases(yamlFormat, configuration, xdgCache):
         packageList = [package for package in database.getnames() if "/" not in package]
         packagesDictionary["Manjaro"][repository] = packageList
 
-    if not yamlFormat:
+    if not outFormat:
         print("    => Parsing Arch databases")
     
     #Generate Arch package list
@@ -82,12 +82,12 @@ def prepareDatabases(yamlFormat, configuration, xdgCache):
 
     return packagesDictionary
 
-def compareDatabases(yamlFormat, configuration, databases):
+def compareDatabases(outFormat, configuration, databases):
     """
     Compare the databases and output results
     """
     
-    if not yamlFormat:
+    if not outFormat:
         print("=> Comparing databases")
     
     #Initialize the version change
@@ -133,12 +133,12 @@ def compareVersions(versionOne, versionTwo):
     else:
         return False
     
-def clear(yamlFormat, xdgCache):
+def clear(outFormat, xdgCache):
     """
     Clear the caches
     """
     
-    if not yamlFormat:
+    if not outFormat:
         print("=> Clearing all Cache files")
     
     if path.isdir(xdgCache + "/compare-mirrors"):

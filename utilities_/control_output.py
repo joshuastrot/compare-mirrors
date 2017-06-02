@@ -7,13 +7,13 @@
 # URL: https://github.com/joshuastrot/compare-mirrors
 #
 
-def output(yamlFormat, configuration, versionDifferences):
+def output(outFormat, configuration, versionDifferences):
     """
     Output the version differences. 
     """
     
     #Output format done here:
-    if not yamlFormat:
+    if not outFormat:
         print("=> Version Changes")
     
         #Output all the versions in plain format
@@ -21,7 +21,7 @@ def output(yamlFormat, configuration, versionDifferences):
             print("    => [" + repository + "] Version Changes")
             for packageName, packageVersions in versionDifferences[repository].items():
                 print("        => %s-%s  ->  %s-%s" % (packageName, packageVersions[0], packageName, packageVersions[1]))
-    else:
+    elif outFormat == "yaml":
         # Yaml format:
         #Repository
         #    - Package name
@@ -36,8 +36,24 @@ def output(yamlFormat, configuration, versionDifferences):
         
         #Output in YAML format
         for repository in configuration["Repositories"]:
-            print(repository + ":")
+            print("\"" + repository + "\":")
             for packageName, packageVersions in versionDifferences[repository].items():
-                print("    - " + packageName + ":")
+                print("    - \"" + packageName + "\":")
                 print("        - \"" + packageVersions[0] + "\"")
                 print("        - \"" + packageVersions[1] + "\"")
+                
+    elif outFormat == "csv":
+        # CSV Format:
+        #Package Name, Repository, Version One, Version Two
+        
+        #Output CSV titles
+        print("\"Package Name\", \"Repository\", \"Manjaro Version\", \"Arch Version\"")
+        
+        #Output in YAML format
+        for repository in configuration["Repositories"]:
+            for packageName, packageVersions in versionDifferences[repository].items():
+                print("\"%s\", \"%s\", \"%s\", \"%s\"" % (packageName, repository, packageVersions[0], packageVersions[1]))
+                
+                
+                
+                
