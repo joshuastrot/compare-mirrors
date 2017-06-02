@@ -7,7 +7,7 @@ Compare-Mirrors is a program to compare package differences between Manjaro and 
 
 First, install the needed dependencies. 
 ```
-sudo pacman -S libyaml
+sudo pacman -S python-yaml
 ```
 Then install compare-mirrors, clone it from the git and then run the installer. 
 ```
